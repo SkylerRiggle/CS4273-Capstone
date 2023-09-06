@@ -1,7 +1,7 @@
 {
-  "name": "capstone",
-  "displayName": "Capstone",
-  "description": "example description..",
+  "name": "helloworld",
+  "displayName": "HelloWorld",
+  "description": "test",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.81.0"
@@ -9,13 +9,31 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:python"
+  ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "capstone.helloWorld",
-      "title": "Hello World"
-    }]
+    "languages": [
+      {
+          "id": "python",
+          "extensions": [".py"]
+      }
+
+  ],
+  "hoverProviders": [
+      {
+          "languageId": "python",
+          "providerName": "Your Hover Provider"
+      }
+  ],
+  "commands": [
+      {
+          "command": "extension.generateForLoop",
+          "title": "Generate For Loop",
+          "category": "python"
+      }
+  ]
   },
   "scripts": {
     "lint": "eslint .",
