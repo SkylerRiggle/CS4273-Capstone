@@ -1,0 +1,53 @@
+{
+  "name": "helloworld",
+  "displayName": "HelloWorld",
+  "description": "test",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.81.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+          "id": "python",
+          "extensions": [".py"]
+      }
+
+  ],
+  "hoverProviders": [
+      {
+          "languageId": "python",
+          "providerName": "Your Hover Provider"
+      }
+  ],
+  "commands": [
+      {
+          "command": "extension.generateForLoop",
+          "title": "Generate For Loop",
+          "category": "python"
+      }
+  ]
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "pretest": "npm run lint",
+    "test": "node ./test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.81.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "16.x",
+    "eslint": "^8.47.0",
+    "glob": "^10.3.3",
+    "mocha": "^10.2.0",
+    "typescript": "^5.1.6",
+    "@vscode/test-electron": "^2.3.4"
+  }
+}
