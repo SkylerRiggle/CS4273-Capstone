@@ -1,4 +1,13 @@
 const vscode = require('vscode');
+const { DiscussServiceClient } = require("@google-ai/generativelanguage");
+const { GoogleAuth } = require("google-auth-library");
+// Access the API key
+const apiKey = '';
+
+const MODEL_NAME = "models/chat-bison-001";
+const client = new DiscussServiceClient({
+  authClient: new GoogleAuth().fromAPIKey(apiKey),
+});
 
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.generateForLoop', (document, range) => {
