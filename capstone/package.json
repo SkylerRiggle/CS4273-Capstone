@@ -33,6 +33,11 @@
         "command": "extension.generateForLoop",
         "title": "Generate For Loop",
         "category": "python"
+      },
+      {
+        "command": "extension.generateBatchIterator",
+        "title": "Generate Batch Iterator",
+        "category": "python"
       }
     ]
   },
