@@ -1,6 +1,42 @@
 const vscode = require('vscode');
 
 function activate(context) {
+    context.subscriptions.push(vscode.commands.registerCommand('extension.convertLoopToIterator', (document, range) => {
+        const editor = vscode.window.activeTextEditor;
+
+        if (editor) {
+            const document = editor.document;
+            const selection = editor.selection;
+            const cursorPosition = selection.active;
+
+            // Get the line content where the cursor is
+            const line = document.lineAt(cursorPosition.line).text;
+
+            // Check if the line contains a for loop
+            const forLoopRegex = /for\s+\w+\s+in\s+\w+\s*:/;
+            if (forLoopRegex.test(line)) {
+                // Convert for loop to iterator expression
+                const iteratorText = line.replace(forLoopRegex, 'test');
+                editor.edit((editBuilder) => {
+                    editBuilder.replace(selection, iteratorText);
+                });
+            } else {
+                // Check if the line contains an iterator expression
+                const iteratorRegex = /\(\s*range\s*\(\s*(\w+)\s*\)\s*\)/;
+                const match = line.match(iteratorRegex);
+                if (match) {
+                    // Convert iterator expression to for loop
+                    const variableName = match[1];
+                    const forLoopText = `for ${variableName} in ${line}:`;
+                    editor.edit((editBuilder) => {
+                        editBuilder.replace(selection, forLoopText);
+                    });
+                } else {
+                    vscode.window.showInformationMessage('No for loop or iterator expression found on this line.');
+                }
+            }
+        }
+    }));
     context.subscriptions.push(vscode.commands.registerCommand('extension.generateForLoop', (document, range) => {
         vscode.window.showInformationMessage('For loop generated!'); // Example notification
         const editor = vscode.window.activeTextEditor;
@@ -62,19 +98,31 @@ function activate(context) {
                 });
             }
         }
-    }));
+    }
+    ));
 
     // Register a code action provider
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider('python', {
             provideCodeActions(document, range, context, token) {
-                const codeAction = new vscode.CodeAction('Create for Loop', vscode.CodeActionKind.Refactor);
-                codeAction.command = {
+                const codeActions = [];
+                const forLoopAction = new vscode.CodeAction('Create For Loop', vscode.CodeActionKind.Refactor);
+                forLoopAction.command = {
                     command: 'extension.generateForLoop',
                     title: "Generate For Loop",
                     arguments: [document, range],
                 };
-                return [codeAction];
+                codeActions.push(forLoopAction);
+
+                const convertAction = new vscode.CodeAction('Convert Loop/Iterator', vscode.CodeActionKind.Refactor);
+                convertAction.command = {
+                    command: 'extension.convertLoopToIterator',
+                    title: "Convert Loop to Iterator (or vice-versa)",
+                    arguments: [document, range],
+                };
+                codeActions.push(convertAction);
+
+                return codeActions;
             }
         })
     );
