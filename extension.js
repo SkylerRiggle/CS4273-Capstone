@@ -5,7 +5,9 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.generateForLoop', (document, range) => {
         vscode.window.showInformationMessage('For loop generated!'); // Example notification
         const editor = vscode.window.activeTextEditor;
-        bard.Run();
+
+        bard.Run("Hello Google Bard!");
+
         if (editor) {
             const document = editor.document;
             const selection = editor.selection;
