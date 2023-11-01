@@ -3,9 +3,17 @@ const axios = require("axios").default;
 
 const BARD_URL = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=";
 const BARD_KEY = "AIzaSyBqMhkS25nLgLS-KxFWMpv-NmoRhLKfKXw";
-
 const BARD_COMMENT = RegExp(/#( )*bard:/gmi);
-const PROMPT_ADDON = "Use python, import any needed packages, include code comments as needed, and use explicit types.";
+
+/**
+ * Creates a sanitized and more robust version of the user's prompt
+ * @param {string} userPrompt The user's original prompt
+ * @param {string} fileText The current code in the file
+ * @returns The sanitized and more robust version of the user's prompt
+ */
+const generatePrompt = (userPrompt, fileText) => `${userPrompt.replace(BARD_COMMENT, "").trim()}.
+For context, here is the code so far: ${"```python" + fileText + "```"}
+Use python, import any needed packages, include code comments where appropriate, and use explicit types.`;
 
 /**
  * Generates some code based on the user's input prompt
@@ -33,7 +41,7 @@ const run = async (document) =>
     const response = await axios.post(
         `${BARD_URL}${BARD_KEY}`, {
             prompt: {
-                text: `${prompt.replace(BARD_COMMENT, "").trim()}.\n${PROMPT_ADDON}`
+                text: generatePrompt(prompt, document.getText())
             },
             maxOutputTokens: 5000
         }, {
