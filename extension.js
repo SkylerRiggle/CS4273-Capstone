@@ -2,7 +2,8 @@ const vscode = require('vscode');
 
 /* Handler Imports */
 const commandData = [
-    require("./src/ForLoop")
+    require("./src/ForLoop"),
+    require("./src/BardComments")
 ];
 
 function activate(context) {
@@ -32,7 +33,7 @@ function activate(context) {
 
                     result.push(codeAction);
                 }
-                
+
                 return result;
             }
         })
