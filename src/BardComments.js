@@ -1,8 +1,7 @@
 const vscode = require('vscode');
+const { BARD_URL, BARD_KEY } = require("../config");
 const axios = require("axios").default;
 
-const BARD_URL = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=";
-const BARD_KEY = "AIzaSyBqMhkS25nLgLS-KxFWMpv-NmoRhLKfKXw";
 const BARD_COMMENT = RegExp(/#( )*bard:/gmi);
 
 /**
