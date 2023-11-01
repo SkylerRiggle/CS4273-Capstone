@@ -1,4 +1,8 @@
 const vscode = require('vscode');
+const axios = require("axios").default;
+
+const BARD_URL = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=";
+const BARD_KEY = "AIzaSyBqMhkS25nLgLS-KxFWMpv-NmoRhLKfKXw";
 
 const BARD_COMMENT = "# BARD:";
 const PROMPT_ADDON = "Use python, import any needed packages, include code comments as needed, and use explicit types.";
@@ -18,19 +22,30 @@ const run = async (document) =>
     let prompt = line.text.trim();
     if (!prompt.startsWith(BARD_COMMENT)) { return; }
 
-    // Sanitize the prompt and add the "under the hood" comments
-    prompt = `${prompt.replace(BARD_COMMENT, "")}.\n${PROMPT_ADDON}`;
-
     // Send the prompt to the Bard API for generation
-    // TODO
-    let code = "```python\nfor i in range(0, 10):\n\tprint(i)\n```";
+    const response = await axios.post(
+        `${BARD_URL}${BARD_KEY}`, {
+            prompt: {
+                text: `${prompt.replace(BARD_COMMENT, "")}.\n${PROMPT_ADDON}`
+            },
+            maxOutputTokens: 5000
+        }, {
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }
+    );
+    if (!response.data) { return; }
 
-    // Sanitize the generated code
-    code = code.replace("```python", "").replace("```", "").trim();
+    /** @type {string} */
+    const code = response.data.candidates[0].output;
 
     // Insert the code into the file in place of the comment
     editor.edit((editBuilder) => {
-        editBuilder.replace(line.range, code);
+        editBuilder.replace(
+            line.range,
+            code.replace("```python", "").replace(/\n```(.*)/gms, "").trim()
+        );
     });
 }
 
