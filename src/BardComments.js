@@ -10,9 +10,9 @@ const BARD_COMMENT = RegExp(/#( )*bard:/gmi);
  * @param {string} fileText The current code in the file
  * @returns The sanitized and more robust version of the user's prompt
  */
-const generatePrompt = (userPrompt, fileText) => `${userPrompt.replace(BARD_COMMENT, "").trim()}.
-For context, here is the code so far: ${"```python" + fileText + "```"}
-Use python, import any needed packages, include code comments where appropriate, and use explicit types.`;
+const generatePrompt = (userPrompt, fileText, language) => `${userPrompt.replace(BARD_COMMENT, "").trim()}.
+For context, here is the code so far: ${"```" + language + '\n' + fileText + "\n```"}
+Use ${language}, import any needed packages, include code comments where appropriate, and use explicit types.`;
 
 /**
  * Generates some code based on the user's input prompt
@@ -40,7 +40,7 @@ const run = async (document) =>
     const response = await axios.post(
         `${BARD_URL}${BARD_KEY}`, {
             prompt: {
-                text: generatePrompt(prompt, document.getText())
+                text: generatePrompt(prompt, document.getText(), document.languageId)
             },
             maxOutputTokens: 5000
         }, {
