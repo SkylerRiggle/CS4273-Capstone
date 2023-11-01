@@ -4,7 +4,7 @@ const axios = require("axios").default;
 const BARD_URL = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=";
 const BARD_KEY = "AIzaSyBqMhkS25nLgLS-KxFWMpv-NmoRhLKfKXw";
 
-const BARD_COMMENT = "# BARD:";
+const BARD_COMMENT = RegExp(/#( )*bard:/gmi);
 const PROMPT_ADDON = "Use python, import any needed packages, include code comments as needed, and use explicit types.";
 
 /**
@@ -22,8 +22,8 @@ const run = async (document) =>
 
     // Ensure that the line in question is a bard command
     const line = document.lineAt(editor.selection.active);
-    let prompt = line.text.trim();
-    if (!prompt.startsWith(BARD_COMMENT))
+    const prompt = line.text;
+    if (!prompt.match(BARD_COMMENT))
     {
         return vscode.window.showErrorMessage('Input Was Not A Valid Bard Comment...');
     }
@@ -33,7 +33,7 @@ const run = async (document) =>
     const response = await axios.post(
         `${BARD_URL}${BARD_KEY}`, {
             prompt: {
-                text: `${prompt.replace(BARD_COMMENT, "")}.\n${PROMPT_ADDON}`
+                text: `${prompt.replace(BARD_COMMENT, "").trim()}.\n${PROMPT_ADDON}`
             },
             maxOutputTokens: 5000
         }, {
