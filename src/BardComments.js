@@ -15,14 +15,21 @@ const run = async (document) =>
 {
     // Get the currently active editor
     const editor = vscode.window.activeTextEditor;
-    if (!editor) { return; }
+    if (!editor)
+    {
+        return vscode.window.showErrorMessage('Editor Not Found...');
+    }
 
     // Ensure that the line in question is a bard command
     const line = document.lineAt(editor.selection.active);
     let prompt = line.text.trim();
-    if (!prompt.startsWith(BARD_COMMENT)) { return; }
+    if (!prompt.startsWith(BARD_COMMENT))
+    {
+        return vscode.window.showErrorMessage('Input Was Not A Valid Bard Comment...');
+    }
 
     // Send the prompt to the Bard API for generation
+    vscode.window.showInformationMessage('Generating Response...');
     const response = await axios.post(
         `${BARD_URL}${BARD_KEY}`, {
             prompt: {
@@ -35,7 +42,10 @@ const run = async (document) =>
             }
         }
     );
-    if (!response.data) { return; }
+    if (!response.data)
+    {
+        return vscode.window.showErrorMessage('Error Generating Code With Bard API...');
+    }
 
     /** @type {string} */
     const code = response.data.candidates[0].output;
@@ -47,6 +57,7 @@ const run = async (document) =>
             code.replace("```python", "").replace(/\n```(.*)/gms, "").trim()
         );
     });
+    vscode.window.showInformationMessage('Code Successfully Generated!');
 }
 
 module.exports = {
