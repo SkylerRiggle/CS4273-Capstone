@@ -3,7 +3,10 @@ const vscode = require('vscode');
 /* Handler Imports */
 const commandData = [
     require("./src/ForLoop"),
-    require("./src/BardComments")
+    require("./src/BardComments"),
+    require("./src/Threading"),
+    require("./src/SetThreadingFunction"),
+    require("./src/ThreadWithFunction")
 ];
 
 function activate(context) {
