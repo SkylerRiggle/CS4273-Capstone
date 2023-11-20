@@ -42,6 +42,7 @@
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
+    "build": "vsce package",
     "test": "node ./test/runTest.js"
   },
   "devDependencies": {
