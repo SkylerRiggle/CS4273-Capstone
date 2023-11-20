@@ -7,7 +7,9 @@ const commandData = [
     require("./src/Threading"),
     require("./src/SetThreadingFunction"),
     require("./src/ThreadWithFunction"),
-    require("./src/BatchIterator")
+    require("./src/BatchIterator"),
+    require("./src/LoopToIterator"),
+    require("./src/IteratorToLoop")
 ];
 
 function activate(context) {
