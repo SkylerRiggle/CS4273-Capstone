@@ -6,7 +6,8 @@ const commandData = [
     require("./src/BardComments"),
     require("./src/Threading"),
     require("./src/SetThreadingFunction"),
-    require("./src/ThreadWithFunction")
+    require("./src/ThreadWithFunction"),
+    require("./src/BatchIterator")
 ];
 
 function activate(context) {
