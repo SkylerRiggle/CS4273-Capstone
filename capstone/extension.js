@@ -1,7 +1,46 @@
 const vscode = require('vscode');
 
+
 function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('extension.convertLoopToIterator', (document, range) => {
+        const editor = vscode.window.activeTextEditor;
+
+        if (editor) {
+            const document = editor.document;
+            const selection = editor.selection;
+            const cursorPosition = selection.active;
+
+            // Get the lines where the loop is located
+            const loopStartLine = document.lineAt(range.start.line).text;
+            const loopEndLine = document.lineAt(range.end.line).text;
+
+            // Use a regular expression to extract loop variable and iterable
+            const loopRegex = /\bfor\s+(\w+)\s+in\s+(\w+):/;
+            const matchStart = loopStartLine.match(loopRegex);
+            const matchEnd = loopEndLine.match(/^\s+(.*)/);
+
+            if (matchStart && matchEnd) {
+                const loopVariable = matchStart[1];
+                const iterable = matchStart[2];
+                const operation = matchEnd[1].trim(); // Extract operation inside the loop
+
+                // Use a regular expression to extract the variable used for appending
+                const appendRegex = /\b(\w+)\.append/;
+                const appendMatch = operation.match(appendRegex);
+                const resultVariable = appendMatch ? appendMatch[1] : 'result';
+
+                // Generate the list comprehension expression with assignment to the variable
+                const listComprehension = `${resultVariable} = [${operation.replace(`${resultVariable}.append`, '')} for ${loopVariable} in ${iterable}]`;
+
+                editor.edit((editBuilder) => {
+                    // Replace the loop and its content with the list comprehension
+                    editBuilder.replace(range, listComprehension);
+                });
+            }
+        }
+    }));
+
+    context.subscriptions.push(vscode.commands.registerCommand('extension.convertIteratorToLoop', (document, range) => {
         const editor = vscode.window.activeTextEditor;
 
         if (editor) {
@@ -12,31 +51,29 @@ function activate(context) {
             // Get the line content where the cursor is
             const line = document.lineAt(cursorPosition.line).text;
 
-            // Check if the line contains a for loop
-            const forLoopRegex = /for\s+\w+\s+in\s+\w+\s*:/;
-            if (forLoopRegex.test(line)) {
-                // Convert for loop to iterator expression
-                const iteratorText = line.replace(forLoopRegex, 'test');
+            // Use a regular expression to extract information from the list comprehension
+            const listComprehensionRegex = /^(\w+)\s*=\s*\[([\s\S]*)\s+for\s+(\w+)\s+in\s+(\w+)\]$/;
+            const match = line.match(listComprehensionRegex);
+
+            if (match) {
+                const resultVariable = match[1];
+                const operation = match[2].trim();
+                const loopVariable = match[3];
+                const iterable = match[4];
+
+                // Generate the for loop expression
+                const forLoopExpression = `for ${loopVariable} in ${iterable}:\n\t${resultVariable}.append(${operation})`;
+
                 editor.edit((editBuilder) => {
-                    editBuilder.replace(selection, iteratorText);
+                    // Replace the list comprehension with the for loop
+                    editBuilder.replace(range, forLoopExpression);
                 });
-            } else {
-                // Check if the line contains an iterator expression
-                const iteratorRegex = /\(\s*range\s*\(\s*(\w+)\s*\)\s*\)/;
-                const match = line.match(iteratorRegex);
-                if (match) {
-                    // Convert iterator expression to for loop
-                    const variableName = match[1];
-                    const forLoopText = `for ${variableName} in ${line}:`;
-                    editor.edit((editBuilder) => {
-                        editBuilder.replace(selection, forLoopText);
-                    });
-                } else {
-                    vscode.window.showInformationMessage('No for loop or iterator expression found on this line.');
-                }
             }
         }
     }));
+
+    
+
     context.subscriptions.push(vscode.commands.registerCommand('extension.generateForLoop', (document, range) => {
         vscode.window.showInformationMessage('For loop generated!'); // Example notification
         const editor = vscode.window.activeTextEditor;
@@ -101,7 +138,6 @@ function activate(context) {
     }
     ));
 
-    // Register a code action provider
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider('python', {
             provideCodeActions(document, range, context, token) {
@@ -114,13 +150,21 @@ function activate(context) {
                 };
                 codeActions.push(forLoopAction);
 
-                const convertAction = new vscode.CodeAction('Convert Loop/Iterator', vscode.CodeActionKind.Refactor);
-                convertAction.command = {
+                const convertToIteratorAction = new vscode.CodeAction('Convert Loop to Iterator', vscode.CodeActionKind.Refactor);
+                convertToIteratorAction.command = {
                     command: 'extension.convertLoopToIterator',
-                    title: "Convert Loop to Iterator (or vice-versa)",
+                    title: "Convert Loop to Iterator",
                     arguments: [document, range],
                 };
-                codeActions.push(convertAction);
+                codeActions.push(convertToIteratorAction);
+
+                const convertToLoopAction = new vscode.CodeAction('Convert Iterator to Loop', vscode.CodeActionKind.Refactor);
+                convertToLoopAction.command = {
+                    command: 'extension.convertIteratorToLoop',
+                    title: "Convert Iterator to Loop",
+                    arguments: [document, range],
+                };
+                codeActions.push(convertToLoopAction);
 
                 return codeActions;
             }
