@@ -1,8 +1,11 @@
 {
-  "name": "helloworld",
-  "displayName": "HelloWorld",
-  "description": "test",
-  "version": "0.0.1",
+  "name": "orce",
+  "displayName": "Our Really Cool Extension",
+  "description": "It does some pretty nifty stuff",
+  "version": "1.0.0",
+  "repository": {
+    "url": "https://github.com/SkylerRiggle/CS4273-Capstone"
+  },
   "engines": {
     "vscode": "^1.81.0"
   },
