@@ -29,8 +29,17 @@ const run = async (range) =>
 
             // Use a regular expression to extract variable name, type, and value
             const variableRegex = /\b(\w+)\s*=\s*([^#]+)/;
+            const importThread = "import threading";
+            let hasImport = false;
             // Modify this regex as per your code's conventions
             const match = line.match(variableRegex);
+
+            for (let i = 0; i < document.lineCount; i++){
+                let currPosition = document.lineAt(i).text;
+                if (currPosition.match(importThread)){
+                    hasImport = true;
+                }
+            }
 
             if (match) {
                 const variableName = match[1];
@@ -54,7 +63,6 @@ const run = async (range) =>
                 console.log(`Variable Type: ${variableType}`);
                 
                 // Determine how to create a for loop based on data type
-                let importThread = "import threading"
                 let forLoopText;
                 if (variableType == 'list') {
                     forLoopText = "\nfor "+variableName+"_item in "+variableName+":\n\tthreading.Thread(target=" + threadFunc + ",args=["+variableName+"_item,]).start()\n";
@@ -70,8 +78,10 @@ const run = async (range) =>
                 }
 
                 editor.edit((editBuilder) => {
-                    editBuilder.insert(topPosition, importThread);
-                    editBuilder.insert(newPosition, forLoopText); // Insert text and a newline character
+                    if (!hasImport){
+                        editBuilder.insert(topPosition, importThread + "\n");
+                    }
+                    editBuilder.insert(newPosition, forLoopText + "\n"); // Insert text and a newline character
                 });
             }
         }
