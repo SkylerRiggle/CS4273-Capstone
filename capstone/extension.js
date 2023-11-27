@@ -9,7 +9,8 @@ const commandData = [
     require("./src/ThreadWithFunction"),
     require("./src/BatchIterator"),
     require("./src/LoopToIterator"),
-    require("./src/IteratorToLoop")
+    require("./src/IteratorToLoop"),
+    require("./src/PandasFilter.js")
 ];
 
 function activate(context) {
