@@ -10,7 +10,7 @@ const commandData = [
     require("./src/BatchIterator"),
     require("./src/LoopToIterator"),
     require("./src/IteratorToLoop"),
-    require("./src/PandasFilter.js")
+    require("./src/PandasFilter")
 ];
 
 function activate(context) {
